@@ -26,6 +26,24 @@ async def on_ready():
 
 
 @bot.command()
+async def roll(ctx, *args):
+    result_message = ''
+    if len(args) >= 1 and 'advantage' not in args[0]:
+        roll_msg = "".join(str(x) for x in args)
+        result_message = '\n'+generate_dice_results(roll_msg, 'roll')
+
+    elif len(args) >= 2 and 'advantage' in args[0]:
+        roll_msg = "".join(str(x) for x in args[1:])
+        result_message = '\n'+generate_dice_results(roll_msg, args[0])
+
+    else:
+        result_message = ' Could not interpret roll:\n'+" ".join(str(x) for x in args)
+
+    emb = discord.Embed(color=discord.Colour(16777030), description=result_message, title='Results:')
+    await ctx.reply(embed=emb)
+
+
+@bot.command()
 async def loading(ctx):
     emb = discord.Embed(color=discord.Colour(16777030), description=loading_screen_messages[random.randrange(
         0, len(loading_screen_messages))], title='Loading...')

@@ -29,8 +29,9 @@ def decipher_roll_message(message):
                 rolls.append((1, int(split_roll[1])))
             else:
                 return False
-        elif roll.isnumeric and int(roll) >= 0:
+        elif roll.isnumeric() and int(roll) >= 0:
             rolls.append((int(roll), 1))
+
         else:
             return False
     return rolls

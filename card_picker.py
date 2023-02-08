@@ -24,7 +24,7 @@ card_decks = {
     },
     'tarot-minor': {
         'separator': '-of-',
-        'suits': ['Wands', 'Cups', 'Swords', 'Diamonds'],
+        'suits': ['Wands', 'Cups', 'Swords', 'Pentacles'],
         'values': ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Page', 'Knight', 'Queen', 'King', 'Ace']
     },
     'deck-of-omens': {

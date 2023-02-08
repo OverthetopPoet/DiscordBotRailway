@@ -8,6 +8,9 @@ from dice_roller import generate_dice_results, generate_stat_array
 import random
 from card_picker import draw_cards
 import dropbox
+import aiohttp
+import io
+
 
 dropbox_token = os.environ["DROPBOX_TOKEN"]
 

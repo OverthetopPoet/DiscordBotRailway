@@ -88,7 +88,7 @@ async def cards(ctx, card_count, deck_type, *options):
         result_message = ''
         card_files = []
         if result == []:
-            result_message = 'Unable to interpret request. Type '+command_identifier+'help cards for more information.'
+            result_message = 'Unable to interpret request. Type "'+command_identifier+'bothelp cards" for more information.'
             emb = discord.Embed(color=discord.Colour(16777030), description=result_message, title='Error:')
             await ctx.reply(embed=emb)
 
@@ -178,7 +178,7 @@ async def loading(ctx):
 async def bothelp(ctx, type=None):
     result_message = ''
     if type == None:
-        result_message = 'If you need assistance with one of the features please type one of the following commands:\n' + command_identifier+'help dice - information about the dice roller\n' + command_identifier+'help cards - information about the card picker\n' + \
+        result_message = 'If you need assistance with one of the features please type one of the following commands:\n' + command_identifier+'bothelp dice - information about the dice roller\n' + command_identifier+'bothelp cards - information about the card picker\n' + \
             command_identifier + \
             'loading - receive a randomized loading screen message\n' + command_identifier+'randmeme - sends a random dnd meme'
     elif type == 'dice':

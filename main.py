@@ -179,8 +179,8 @@ async def bothelp(ctx, type=None):
     result_message = ''
     if type == None:
         result_message = 'If you need assistance with one of the features please type one of the following commands:\n' + command_identifier+'help dice - information about the dice roller\n' + command_identifier+'help cards - information about the card picker\n' + \
-            command_identifier+'help rollup - help on how to generate a random character\n' + command_identifier + \
-            'loading- receive a randomized loading screen message\n' + command_identifier+'randmeme - sends a random dnd meme'
+            command_identifier + \
+            'loading - receive a randomized loading screen message\n' + command_identifier+'randmeme - sends a random dnd meme'
     elif type == 'dice':
         result_message = 'These are my dice rolling commands:\n' + command_identifier+'roll - rolls any number of dice or bonuses and calculates the end result.\n' + command_identifier + \
             'advantage - rolls any number of dice or bonuses and calculates the end result. All dice are rolled at advantage. (the die is rolled twice and the higher result is highlighted and added to the end result)\n' + command_identifier+'disadvantage - rolls any number of dice or bonuses and calculates the end result. All dice are rolled at disadvantage. (the die is rolled twice and the lower result is highlighted and added to the end result)\n' + \

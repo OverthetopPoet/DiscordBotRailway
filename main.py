@@ -118,7 +118,7 @@ async def cards(ctx, card_count, deck_type, *options):
                             return await ctx.send('Could not download file...')
                         card_files.append(discord.File(io.BytesIO(await resp.read()), card_file+'.jpg'))
 
-                card_files.append(discord.File('cards/'+card_file+'.jpg', filename=card_file+'.jpg'))
+                #card_files.append(discord.File('cards/'+card_file+'.jpg', filename=card_file+'.jpg'))
                 new_embed.set_image(url='attachment://'+card_file+'.jpg')
                 emb.append(new_embed)
 

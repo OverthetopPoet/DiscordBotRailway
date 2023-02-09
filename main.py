@@ -185,7 +185,7 @@ async def bothelp(ctx, type=None):
         result_message = 'These are my dice rolling commands:\n' + command_identifier+'roll - rolls any number of dice or bonuses and calculates the end result.\n' + command_identifier + \
             'advantage - rolls any number of dice or bonuses and calculates the end result. All dice are rolled at advantage. (the die is rolled twice and the higher result is highlighted and added to the end result)\n' + command_identifier+'disadvantage - rolls any number of dice or bonuses and calculates the end result. All dice are rolled at disadvantage. (the die is rolled twice and the lower result is highlighted and added to the end result)\n' + \
             'Example: ' + command_identifier + \
-            '[roll/advantage/disadvantage] [1]d10 + 2d4 + 2\n Note: If you only want to roll a single die, you can omit the 1 in front of "d".'
+            'roll [advantage/disadvantage] [1]d10 + 2d4 + 2\n Note: If you only want to roll a single die, you can omit the 1 in front of "d".'
     elif type == 'cards':
         result_message = 'These are my card commands:\n' + command_identifier+'cards - draws any number of cards from different deck types.\n' + 'Example: ' + command_identifier + \
             'cards [number of cards] [deck type] [options]\n' + 'deck type: you can choose from the following: standard-52, standard-32,tarot-major, tarot-minor, tarot, deck-of-omens, uno\n' + \

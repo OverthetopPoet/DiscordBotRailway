@@ -12,7 +12,7 @@ import aiohttp
 import io
 
 
-dropbox_token = os.environ["DROPBOX_TOKEN"]
+dropbox_token = str(os.environ["DROPBOX_TOKEN"])
 
 
 f_load_msg = open('loading_screen_messages.txt', 'r', encoding='utf-8')
@@ -156,11 +156,8 @@ async def bothelp(ctx, type=None):
             'cards [number of cards] [deck type] [options]\n' + 'deck type: you can choose from the following: standard-52, standard-32,tarot-major, tarot-minor, tarot, deck-of-omens, uno\n' + \
             'options (choose any number that apply that apply): \n-xJokers - add x Joker cards to the deck, x must be a number\n-oriented - include tarot card orientation in result (u for upright, r for reversed)'
 
-    elif type == 'rollup':
-        result_message = 'You can roll up ability scores either one at a time or roll up all six at once. Additionally you have the option to specify, what method of stat generation you want to use.'+'\nTemplate: '+command_identifier + \
-            'rollup [type] [method]\ntype: \n- single: rolls up one ability score\n- character: rolls up six ability scores\nmethod: \n- standard: roll 4d6 and drop the lowest (this will be the used method, if you leave this part out)\n- hard: roll 3d6'
     else:
-        result_message = 'Type ''+command_identifier+"bothelp" for all  available help commands'
+        result_message = 'Type "'+command_identifier+'bothelp" for all  available help commands'
 
     emb = discord.Embed(color=discord.Colour(16777030), description=result_message, title='Help:')
     await ctx.reply(embed=emb)

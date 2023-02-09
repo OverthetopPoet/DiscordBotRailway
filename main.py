@@ -7,17 +7,42 @@ from discord.ext import commands
 from dice_roller import generate_dice_results, generate_stat_array
 import random
 from card_picker import draw_cards
-import dropbox
 import aiohttp
 import io
-
-
-dropbox_token = str(os.environ["DROPBOX_TOKEN"])
+import flickrapi
 
 
 f_load_msg = open('loading_screen_messages.txt', 'r', encoding='utf-8')
 loading_screen_messages = f_load_msg.readlines()
 f_load_msg.close()
+
+
+flickr_key = os.environ["FLICKR_KEY"]
+flickr_secret = os.environ["FLICKR_SECRET"]
+flickr_user = os.environ["FLICKR_USER"]
+
+
+flickr = flickrapi.FlickrAPI(flickr_key, flickr_secret, format='parsed-json')
+sets = flickr.photosets.getList(user_id=flickr_user)
+
+flickr_folders = {}
+
+for folder in sets['photosets']['photoset']:
+    flickr_folders.update({folder['title']['_content']: folder['id']})
+
+memes_id = flickr_folders['Memes']
+cards_id = flickr_folders['Cards']
+
+meme_photos = flickr.photosets.getPhotos(api_key=flickr_key, photoset_id=memes_id, user_id=flickr_user)
+meme_list = meme_photos['photoset']['photo']
+
+card_photos = flickr.photosets.getPhotos(api_key=flickr_key, photoset_id=cards_id, user_id=flickr_user)
+
+card_list = {}
+for photo in card_photos['photoset']['photo']:
+
+    card_list.update({photo['title']: photo['id']})
+
 
 command_identifier = '$'
 
@@ -33,7 +58,6 @@ async def on_ready():
 
 @bot.command()
 async def cards(ctx, card_count, deck_type, *options):
-    dbx = dropbox.Dropbox(dropbox_token)
 
     if not card_count.isnumeric():
         card_count = 1
@@ -80,7 +104,14 @@ async def cards(ctx, card_count, deck_type, *options):
                 card_file = card_file.replace('(U)', '')
                 card_file = card_file.replace('(R)', '-rotated')
 
-                link = dbx.files_get_temporary_link('/cards/'+card_file+'.jpg').link
+                link = ''
+                photo = flickr.photos.getSizes(api_key=flickr_key, photo_id=card_list[card_file])
+                for i in range(len(photo['sizes']['size'])):
+
+                    if photo['sizes']['size'][i]['label'] == 'Original':
+                        link = photo['sizes']['size'][i]['source']
+                        break
+
                 async with aiohttp.ClientSession() as session:
                     async with session.get(link) as resp:
                         if resp.status != 200:
@@ -97,21 +128,25 @@ async def cards(ctx, card_count, deck_type, *options):
 @bot.command()
 async def randmeme(ctx):
 
-    dbx = dropbox.Dropbox(dropbox_token)
-    memes = dbx.files_list_folder('/memes').entries
+    first_photo = meme_list[random.randrange(0, len(meme_list))]
+    photo_id = first_photo['id']
+    photo = flickr.photos.getSizes(api_key=flickr_key, photo_id=photo_id)
 
-    entry = memes[random.randint(0, len(memes))]
-    link = dbx.files_get_temporary_link('/memes/'+entry.name).link
+    link = ''
+    for i in range(len(photo['sizes']['size'])):
 
-    emb = discord.Embed()
-    emb.set_image(url='attachment://'+entry.name)
+        if photo['sizes']['size'][i]['label'] == 'Original':
+            link = photo['sizes']['size'][i]['source']
+            break
+    emb = discord.Embed(color=discord.Colour(16777030))
+    emb.set_image(url='attachment://'+'unknown.jpg')
 
     async with aiohttp.ClientSession() as session:
         async with session.get(link) as resp:
             if resp.status != 200:
                 return await ctx.send('Could not download file...')
             data = io.BytesIO(await resp.read())
-            await ctx.reply(file=discord.File(data, entry.name), embed=emb)
+            await ctx.reply(file=discord.File(data, 'unknown.jpg'), embed=emb)
 
 
 @bot.command()

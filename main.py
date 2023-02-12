@@ -204,5 +204,5 @@ async def hello(ctx):
     emb = discord.Embed(color=discord.Colour(16777030), description=result_message, title='Help:')
     await ctx.reply(embed=emb)
 
-
+keep_alive()
 bot.run(os.environ["DISCORD_TOKEN"])

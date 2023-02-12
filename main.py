@@ -49,12 +49,14 @@ command_identifier = '$'
 
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix=command_identifier, intents=intents)
+bot = commands.Bot(command_prefix=command_identifier, intents=intents,
+                   help_command=None)
 
 
 @bot.event
 async def on_ready():
-    print(f"Logged in as {bot.user}")
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name='$bothelp'))
+    print(f'Logged in as {bot.user}')
 
 
 @bot.command()
@@ -214,16 +216,6 @@ async def bothelp(ctx, type=None):
                         description=result_message,
                         title='Help:')
     await ctx.reply(embed=emb)
-
-
-@bot.command()
-async def hello(ctx):
-    result_message = 'Heyyy!'
-    emb = discord.Embed(color=discord.Colour(16777030),
-                        description=result_message,
-                        title='Help:')
-    await ctx.reply(embed=emb)
-
 
 keep_alive()
 bot.run(os.environ["DISCORD_TOKEN"])

@@ -198,4 +198,11 @@ async def bothelp(ctx, type=None):
     await ctx.reply(embed=emb)
 
 
+@bot.command()
+async def hello(ctx):
+    result_message = 'Hi!'
+    emb = discord.Embed(color=discord.Colour(16777030), description=result_message, title='Help:')
+    await ctx.reply(embed=emb)
+
+
 bot.run(os.environ["DISCORD_TOKEN"])

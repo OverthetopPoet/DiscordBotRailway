@@ -16,12 +16,10 @@ f_load_msg = open('loading_screen_messages.txt', 'r', encoding='utf-8')
 loading_screen_messages = f_load_msg.readlines()
 f_load_msg.close()
 
-flickr_key = os.environ["FLICKR_KEY"]
-flickr_secret = os.environ["FLICKR_SECRET"]
-flickr_user = os.environ["FLICKR_USER"]
-
-flickr = flickrapi.FlickrAPI(flickr_key, flickr_secret, format='parsed-json')
-sets = flickr.photosets.getList(user_id=flickr_user)
+flickr = flickrapi.FlickrAPI(os.environ["FLICKR_KEY"],
+                             os.environ["FLICKR_SECRET"],
+                             format='parsed-json')
+sets = flickr.photosets.getList(user_id=os.environ["FLICKR_USER"])
 
 flickr_folders = {}
 
@@ -90,9 +88,10 @@ async def cards(ctx, card_count, deck_type, *options):
       await ctx.reply(embed=emb)
 
     else:
-      card_photos = flickr.photosets.getPhotos(api_key=flickr_key,
-                                               photoset_id=cards_id,
-                                               user_id=flickr_user)
+      card_photos = flickr.photosets.getPhotos(
+        api_key=os.environ["FLICKR_KEY"],
+        photoset_id=cards_id,
+        user_id=os.environ["FLICKR_USER"])
       card_list = {}
       for photo in card_photos['photoset']['photo']:
         card_list.update({photo['title']: photo['id']})
@@ -110,7 +109,7 @@ async def cards(ctx, card_count, deck_type, *options):
         card_file = card_file.replace('(R)', '-rotated')
 
         link = ''
-        photo = flickr.photos.getSizes(api_key=flickr_key,
+        photo = flickr.photos.getSizes(api_key=os.environ["FLICKR_KEY"],
                                        photo_id=card_list[card_file])
         for i in range(len(photo['sizes']['size'])):
 
@@ -134,14 +133,15 @@ async def cards(ctx, card_count, deck_type, *options):
 
 @bot.command()
 async def randmeme(ctx):
-  meme_photos = flickr.photosets.getPhotos(api_key=flickr_key,
+  meme_photos = flickr.photosets.getPhotos(api_key=os.environ["FLICKR_KEY"],
                                            photoset_id=memes_id,
-                                           user_id=flickr_user)
+                                           user_id=os.environ["FLICKR_USER"])
   meme_list = meme_photos['photoset']['photo']
 
   first_photo = meme_list[random.randrange(0, len(meme_list))]
   photo_id = first_photo['id']
-  photo = flickr.photos.getSizes(api_key=flickr_key, photo_id=photo_id)
+  photo = flickr.photos.getSizes(api_key=os.environ["FLICKR_KEY"],
+                                 photo_id=photo_id)
 
   link = ''
   for i in range(len(photo['sizes']['size'])):
@@ -162,12 +162,16 @@ async def randmeme(ctx):
 
 @bot.command()
 async def roll(ctx, *args):
+  roll_types = {
+    "advantage", "disadvantage", "explode", "explode-up", "explode-down"
+  }
   result_message = ''
-  if len(args) >= 1 and 'advantage' not in args[0]:
+  if len(
+      args) >= 1 and 'advantage' not in args[0] and 'explode' not in args[0]:
     roll_msg = ''.join(str(x) for x in args)
     result_message = '\n' + generate_dice_results(roll_msg, 'roll')
 
-  elif len(args) >= 2 and 'advantage' in args[0]:
+  elif len(args) >= 2 and ('advantage' in args[0] or 'explode' in args[0]):
     roll_msg = ''.join(str(x) for x in args[1:])
     result_message = '\n' + generate_dice_results(roll_msg, args[0])
 
@@ -198,10 +202,14 @@ async def bothelp(ctx, type=None):
         command_identifier + \
         'loading - receive a randomized loading screen message\n' + command_identifier+'randmeme - sends a random dnd meme'
   elif type == 'dice':
-    result_message = 'These are my dice rolling commands:\n' + command_identifier+'roll - rolls any number of dice or bonuses and calculates the end result.\n' + command_identifier + \
-        'advantage - rolls any number of dice or bonuses and calculates the end result. All dice are rolled at advantage. (the die is rolled twice and the higher result is highlighted and added to the end result)\n' + command_identifier+'disadvantage - rolls any number of dice or bonuses and calculates the end result. All dice are rolled at disadvantage. (the die is rolled twice and the lower result is highlighted and added to the end result)\n' + \
+    result_message = 'These are my dice rolling commands:\n' + command_identifier+'roll - rolls any number of dice or bonuses and calculates the end result.\n' + \
+        'Options:\nadvantage - rolls any number of dice or bonuses and calculates the end result. All dice are rolled at advantage. (the die is rolled twice and the higher result is highlighted and added to the end result)\ndisadvantage - rolls any number of dice or bonuses and calculates the end result. All dice are rolled at disadvantage. (the die is rolled twice and the lower result is highlighted and added to the end result)\n' + \
+        'explode - rerolls the die, when it rolls the maximum number for that die (dice size > 1).\n' + \
+        'explode-up - rolls the next higher die from d4, d6, d8, d10, or d12, when it rolls the maximum number for that die.\n' + \
+        'explode-down - rolls the next higher die from d4, d6, d8, d10, or d12, when it rolls the maximum number for that die.\n' + \
+        'All three explode-types can be limited to the number of rerolls, by adding the limit at the end like so: explode-3 rerolls the die a maximum of three times even if the last reroll is the maximum value of the die.\n' + \
         'Example: ' + command_identifier + \
-        'roll [advantage/disadvantage] [1]d10 + 2d4 + 2\n Note: If you only want to roll a single die, you can omit the 1 in front of "d".'
+        'roll [option] [1]d10 + 2d4 + 2\n Note: If you only want to roll a single die, you can omit the 1 in front of "d".'
   elif type == 'cards':
     result_message = 'These are my card commands:\n' + command_identifier+'cards - draws any number of cards from different deck types.\n' + 'Example: ' + command_identifier + \
         'cards [number of cards] [deck type] [options]\n' + 'deck type: you can choose from the following: standard-52, standard-32,tarot-major, tarot-minor, tarot, deck-of-omens, uno\n' + \

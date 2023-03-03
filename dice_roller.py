@@ -48,7 +48,7 @@ def generate_dice_results(roll_msg, roll_type='roll'):
         for roll in rolls:
             if roll_type == 'roll':
                 results.extend(generate_roll(roll[0], roll[1]))
-            else:
+            elif 'advantage' in roll_type:
                 if roll[0] > 1 and roll[1] == 1:
                     results.append(roll[0])
                 elif roll[0] > 1 and roll[1] > 1:
@@ -56,6 +56,48 @@ def generate_dice_results(roll_msg, roll_type='roll'):
                         results.append(generate_roll(2, roll[1]))
                 elif roll[0] == 1 and roll[1] > 1:
                     results.append(generate_roll(2, roll[1]))
+            elif 'explode' in roll_type:
+                explode_info = roll_type.split('-')
+                if not explode_info[len(explode_info)-1].isnumeric():
+                    explode_info.append(None)
+                if explode_info[len(explode_info)-2] not in ['explode', 'up', 'down']:
+                    return ' Could not interpret roll:\n'+roll_type+' '+roll_msg
+                explode_type = explode_info[len(explode_info)-2]
+                explode_limit = explode_info[len(explode_info)-1]
+                if explode_limit != None:
+                    explode_limit = int(explode_limit)
+                if roll[0] > 1 and roll[1] == 1:
+                    results.append(roll[0])
+                else:
+                    for i in range(roll[0]):
+                        die_size = roll[1]
+                        nr_explodes = 0
+                        exploding = True
+                        res = []
+                        if explode_type == 'explode':
+                            while nr_explodes != explode_limit and exploding == True:
+                                roll_result = generate_roll(1, die_size)
+                                res.extend(roll_result)
+                                if int(roll_result[0]) != int(die_size):
+                                    exploding = False
+                                nr_explodes += 1
+                        elif explode_type == 'up':
+                            while nr_explodes != explode_limit and exploding == True:
+                                roll_result = generate_roll(1, die_size)
+                                res.extend(roll_result)
+                                if int(roll_result[0]) != int(die_size) or die_size not in [4, 6, 8, 10]:
+                                    exploding = False
+                                nr_explodes += 1
+                                die_size += 2
+                        elif explode_type == 'down':
+                            while nr_explodes != explode_limit and exploding == True:
+                                roll_result = generate_roll(1, die_size)
+                                res.extend(roll_result)
+                                if int(roll_result[0]) != int(die_size) or die_size not in [6, 8, 10, 12]:
+                                    exploding = False
+                                nr_explodes += 1
+                                die_size -= 2
+                        results.append(res)
 
         result_sum = 0
         result_text = ''
@@ -70,6 +112,11 @@ def generate_dice_results(roll_msg, roll_type='roll'):
             elif roll_type == 'disadvantage':
                 result_sum += min(result)
                 result_text = result_text+', [**'+str(min(result))+'**, '+str(max(result))+']'
+            elif 'explode' in roll_type:
+                result_text = result_text+', ['+', '.join(str(x) for x in result)+']'
+                for res in result:
+                    result_sum += res
+
         result_text = '[' + result_text[2:] + ']'
 
         result_message = roll_type + ' ' + roll_msg + \
